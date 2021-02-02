@@ -7,14 +7,18 @@ predictor:
 
 training:
     epochs: 250
-    learning_rate: 4.0e-4
+    learning_rate: 8.0e-4 #4.0e-4
     weight_decay: 5.0e-4
     lr_patience: 10
-    es_patience: 35
+    es_patience: 100 #35
+    batch_size: 10
+    shuffle: True
+    optim_name: adamw
+    lr_scheduler: cosine
 
 dataset:
     total_points: 14884
-    training_points: 900
+    training_points: 200
     validation_points: 100
     sampling_method: 'random'
     sampling_seed: 999

@@ -181,12 +181,12 @@ def train(training_set,
                 _, loss, _ = _test(model_module, predictor, g, latency, None, criterion, augments=augments)
                 train_loss += loss
 
-        avg_loss = train_loss / len(training_set)
+        avg_train_loss = train_loss / len(training_set)
 
         if not predictor.binary_classifier:
             train_accuracies = [train_correct / len(training_set) for train_correct in train_corrects]
             print(f'Top +-{leeways} Accuracy of train set for epoch {epoch_no}: {train_accuracies} ')
-        print(f'Average loss of training set {epoch_no}: {avg_loss}')
+        print(f'Average loss of training set {epoch_no}: {avg_train_loss}')
 
         if not predictor.binary_classifier:
             val_loss = 0.
@@ -195,10 +195,10 @@ def train(training_set,
                 for i, c in enumerate(corrects):
                     test_corrects[i] += c
                 val_loss += loss
-            avg_loss = val_loss / len(validation_set)
+            avg_val_loss = val_loss / len(validation_set)
 
             current_accuracies = [test_correct / len(validation_set) for test_correct in test_corrects]
-            print(f'Average loss of validation set {epoch_no}: {avg_loss}')
+            print(f'Average loss of validation set {epoch_no}: {avg_val_loss}')
 
             for i, best_accuracy in enumerate(best_accuracies):
                 if current_accuracies[i] >= best_accuracy:
@@ -238,6 +238,8 @@ def train(training_set,
         if tensorboard:
             handler.add_scalar('loss/training', avg_train_loss, epoch_no)
             handler.add_scalar('loss/validation', avg_val_loss, epoch_no)
+            # handler.add_scalar('loss/training', train_loss, epoch_no)
+            # handler.add_scalar('loss/validation', val_loss, epoch_no)
             handler.add_scalar('accuracy_1/training', train_accuracies[0], epoch_no)
             handler.add_scalar('accuracy_1/validation', current_accuracies[0], epoch_no)
             handler.add_scalar('accuracy_5/training', train_accuracies[1], epoch_no)
@@ -452,7 +454,8 @@ if __name__ == '__main__':
     parser.add_argument('--sample_best2', action='store_true')
     parser.add_argument('--reset_last', action='store_true', help='Reset last layer (only applicable if checkpoint is loaded)')
     args = parser.parse_args()
-
+    import time
+    _time_ = time.strftime('%Y%m%d%H%M%S_')
     if args.uid is not None:
         if args.exp is None:
             args.exp = str(args.uid)
@@ -538,6 +541,13 @@ if __name__ == '__main__':
                         augments.append(d)
             else:
                 augments = None
+        if args.load:
+            exp_load_flg = '_transfer'
+        else:
+            exp_load_flg = ''
+        args.exp = _time_ + args.metric + '_' + args.predictor +'_'+ args.measurement.split('/')[1].split('.')[0] \
+                    +'_'+ str(extra_args.get('dataset', {})['training_points'])\
+                   +exp_load_flg+'_'+ str(extra_args.get('training', {})['learning_rate'])
 
         explored_models = dataset.train_set
         if not args.eval:

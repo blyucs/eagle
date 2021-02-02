@@ -97,7 +97,7 @@ def get_matrix_and_ops(g, prune=True, keep_dims=False):
         elif op == 1: # skip-connection:
             to_del = []
             for other in range(8):
-                if matrix[other][idx+1]:
+                if matrix[other][idx+1]: # idx+1 for the gap of matrix and g (gap 1)
                     for other2 in range(8):
                         if matrix[idx+1][other2]:
                             matrix[other][other2] = 1

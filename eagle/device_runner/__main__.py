@@ -128,6 +128,7 @@ import importlib
 from ..models import model_info
 
 def main(outdir, metric, model_name, device_name, fix=False, framework=None, model_args=None, device_args=None):
+    print('testtttt')
     model_args = model_args or {}
     device_args = device_args or {}
 

@@ -37,9 +37,10 @@ class MLP(nn.Module):
         self.relu = nn.ModuleList([nn.ReLU().double() for i in range(self.nlayer)])
         self.fc = nn.Linear(self.nhid, 1).double()
         self.dropout = nn.ModuleList([nn.Dropout(self.dropout_ratio).double() for i in range(self.nlayer)])
+        self.binary_classifier = None
 
     def forward(self, adjacency, features):
-        x = torch.cat((torch.flatten(features), torch.flatten(adjacency)), 0)
+        x = torch.cat((torch.flatten(features,start_dim=1, end_dim=-1), torch.flatten(adjacency,start_dim=1,end_dim=-1)), 1)
         x = self.relu[0](self.bn[0](self.mlp[0](x)))
         x = self.dropout[0](x)
         for i in range(1,self.nlayer):
